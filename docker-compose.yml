@@ -1,0 +1,26 @@
+version: '2'
+
+services:
+  web:
+    build: web/.
+    environment:
+      - POSTGRES_USER=mmi
+      - POSTGRES_PASSWORD=mm1
+      - POSTGRES_DB=mmi
+      - POSTGRES_HOST=mmitrends_db_1
+      - AMBIENTE=DESENV
+      - MMI_HOST=localhost:3000
+    ports:
+      - "3000:3000"   # web service port
+      - "5859:5859"   # debug port
+    volumes:
+      - ./:/mmi_trends
+    networks:
+        - trends-web-network
+    working_dir: /mmi_trends
+    command: sh -c "npm install && cd web && nodemon app.js"
+    container_name: enduro
+
+networks:
+  trends-web-network:
+    driver: bridge

@@ -1,0 +1,19 @@
+machine: 
+  pre:
+    - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
+    - sudo curl -L "https://github.com/docker/compose/releases/download/1.9.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  services:
+    - docker
+
+test:
+  pre:
+    - echo "manual" | sudo tee /etc/init/postgresql.override
+    - sudo service postgresql stop; sleep 10 # A máquina do circleCI possui um postgres padrão. É necessário pará-lo para evitar conflito de portas com postgres do docker   
+  post:
+    - docker-compose up -d db && docker-compose up -d web && docker-compose up -d selenium && docker-compose run cucumber bundle exec cucumber --tags ~@wip
+
+deployment:
+  homologacao:
+    branch: master
+    heroku:
+      appname: trends-tcs
